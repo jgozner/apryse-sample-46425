@@ -1,16 +1,20 @@
 const { PDFNet } = require('@pdftron/pdfnet-node');
 const { GlobalSignAPI } = require('./api')
-const { LicenseKey } = require('./license-key')
+const { license_key } = require('./license-key.json')
+const path = require('path');
 
-const api = new GlobalSignAPI();
+const api = new GlobalSignAPI();;
 const IN_FILE = "digital-signature.pdf";
 const OUT_FILE = "digital-signature-signed.pdf";
 
+const { PDFDoc, SDFDoc, X509Certificate, DigitalSignatureField, DigestAlgorithm, VerificationOptions } = PDFNet;
+
+
 const main = async () =>{
-    const { PDFDoc, SDFDoc, X509Certificate, DigitalSignatureField, DigestAlgorithm } = PDFNet;
-    
+
     await api.login();
     await api.createSigningIdentity();
+    await api.loadSigningCertificate();
     await api.loadTrustChain();
 
     const doc = await PDFDoc.createFromFilePath(IN_FILE);
@@ -30,10 +34,9 @@ const main = async () =>{
     }
 
     // Create a digital signature dictionary inside the digital signature field, in preparation for signing.
-    const in_PAdES_signing_mode = true;
     await digital_signature_field.createSigDictForCustomSigning(
         "Adobe.PPKLite",
-        in_PAdES_signing_mode ? PDFNet.DigitalSignatureField.SubFilterType.e_ETSI_CAdES_detached : PDFNet.DigitalSignatureField.SubFilterType.e_adbe_pkcs7_detached,
+        PDFNet.DigitalSignatureField.SubFilterType.e_adbe_pkcs7_detached,
         7500
     );
 
@@ -57,8 +60,13 @@ const main = async () =>{
     const cms_signature = await PDFNet.DigitalSignatureField.generateCMSSignature(signer_cert, chain_certs, digest_algorithm_oid, signature_algorithm_oid, signature_buffer, signed_attributes);
     doc.saveCustomSignature(cms_signature, digital_signature_field, OUT_FILE);
 
+    // Verify
+	const opts = await VerificationOptions.create(VerificationOptions.SecurityLevel.e_compatibility_and_archiving);
+	await opts.addTrustedCertificateUString(path.resolve(__dirname, './certs/mTLS.cer'));
+	const result = await doc.verifySignedDigitalSignatures(opts);
+    console.log("Verfication:", result);
 }
 
-PDFNet.runWithCleanup(main, LicenseKey)
+PDFNet.runWithCleanup(main, license_key)
     .catch((err) => console.log("Error:", err))
     .then(() => PDFNet.shutdown());
