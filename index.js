@@ -64,10 +64,10 @@ const main = async () =>{
     
     // Verify
     const saved_doc = await PDFDoc.createFromFilePath(OUT_FILE);
-	const opts = await VerificationOptions.create(VerificationOptions.SecurityLevel.e_compatibility_and_archiving);
-	await opts.addTrustedCertificateUString(path.resolve(__dirname, './certs/mTLS.cer'));
+    const opts = await VerificationOptions.create(VerificationOptions.SecurityLevel.e_compatibility_and_archiving);
+    await opts.addTrustedCertificateUString(path.resolve(__dirname, './certs/mTLS.cer'));
     
-	const result = await saved_doc.verifySignedDigitalSignatures(opts);
+    const result = await saved_doc.verifySignedDigitalSignatures(opts);
     console.log(result)
 
 }
