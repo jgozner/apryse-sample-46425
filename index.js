@@ -33,13 +33,15 @@ const main = async () =>{
         return;
     }
 
+    await digital_signature_field.setDocumentPermissions(DigitalSignatureField.DocumentPermissions.e_no_changes_allowed);
+
     // Create a digital signature dictionary inside the digital signature field, in preparation for signing.
     await digital_signature_field.createSigDictForCustomSigning(
         "Adobe.PPKLite",
         DigitalSignatureField.SubFilterType.e_adbe_pkcs7_detached,
-        7500
+        10000
     );
-
+    
     await doc.save(OUT_FILE, SDFDoc.SaveOptions.e_incremental);
     
     const pdf_digest = await digital_signature_field.calculateDigest(DigestAlgorithm.Type.e_SHA256);
@@ -64,6 +66,7 @@ const main = async () =>{
     const saved_doc = await PDFDoc.createFromFilePath(OUT_FILE);
 	const opts = await VerificationOptions.create(VerificationOptions.SecurityLevel.e_compatibility_and_archiving);
 	await opts.addTrustedCertificateUString(path.resolve(__dirname, './certs/mTLS.cer'));
+    
 	const result = await saved_doc.verifySignedDigitalSignatures(opts);
     console.log(result)
 
