@@ -60,7 +60,7 @@ const main = async () =>{
     const signature_algorithm_oid = await ObjectIdentifier.createFromIntArray([1, 2, 840, 113549, 1, 1]);
 
     const cms_signature = await DigitalSignatureField.generateCMSSignature(signer_cert, chain_certs, digest_algorithm_oid, signature_algorithm_oid, signature_buffer, signed_attributes);
-    doc.saveCustomSignature(cms_signature, digital_signature_field, OUT_FILE);
+    await doc.saveCustomSignature(cms_signature, digital_signature_field, OUT_FILE);
     
     // Verify
     const saved_doc = await PDFDoc.createFromFilePath(OUT_FILE);
