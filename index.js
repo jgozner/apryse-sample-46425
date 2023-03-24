@@ -38,7 +38,7 @@ const main = async () =>{
     // Create a digital signature dictionary inside the digital signature field, in preparation for signing.
     await digital_signature_field.createSigDictForCustomSigning(
         "Adobe.PPKLite",
-        DigitalSignatureField.SubFilterType.e_adbe_pkcs7_detached,
+        DigitalSignatureField.SubFilterType.e_ETSI_CAdES_detached,
         10000
     );
     
