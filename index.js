@@ -64,7 +64,7 @@ const main = async () =>{
     await doc.saveCustomSignature(cms_signature, digital_signature_field, OUT_FILE);
     
     const opts = await VerificationOptions.create(VerificationOptions.SecurityLevel.e_compatibility_and_archiving);
-    await opts.addTrustedCertificateUString(path.resolve(__dirname, './certs/globalsign.non-public.hvca.demo-root.cer'), VerificationOptions.CertificateTrustFlag.e_complete_trust)
+    await opts.addTrustedCertificateUString(path.resolve(__dirname, './certs/root.cer'), VerificationOptions.CertificateTrustFlag.e_complete_trust)
     await opts.enableTrustVerification(true);
 
     const timestamp_verification_result = await digital_signature_field.verify(opts);
